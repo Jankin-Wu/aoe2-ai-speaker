@@ -24,6 +24,8 @@ import com.konyaco.fluent.component.*
 //        }
 //    }
 //}
+var baseUrlState = mutableStateOf("")
+var modelCodeState = mutableStateOf("")
 
 fun main() = application {
     Window(onCloseRequest = ::exitApplication) {
@@ -50,7 +52,7 @@ fun DropdownMenuExample() {
 //                header = { Text("Base Url:") },
                  placeholder = {
                      Text(
-                         "http://127.0.0.01:8080",
+                         "http://127.0.0.1:8080",
                          color = Color.LightGray
                      )
                                },
