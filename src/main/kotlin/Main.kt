@@ -9,6 +9,8 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import com.jankinwu.config.modelMap
+import com.jankinwu.config.saveAppConfig
 import com.konyaco.fluent.component.*
 
 //@Composable
@@ -29,45 +31,55 @@ var modelCodeState = mutableStateOf("")
 
 fun main() = application {
     Window(onCloseRequest = ::exitApplication) {
-        DropdownMenuExample()
+        MainPage()
     }
 }
 
 @Preview
 @Composable
-fun DropdownMenuExample() {
-    Box (
+fun MainPage() {
+    Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
-    ){
-        Column (
+    ) {
+        Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
-        ){
+        ) {
             var value by remember { mutableStateOf(TextFieldValue()) }
             TextField(
                 value = value,
                 onValueChange = { value = it },
 //                header = { Text("Base Url:") },
-                 placeholder = {
-                     Text(
-                         "http://127.0.0.1:8080",
-                         color = Color.LightGray
-                     )
-                               },
+                placeholder = {
+                    Text(
+                        "http://127.0.0.1:8080",
+                        color = Color.LightGray
+                    )
+                },
             )
             Spacer(modifier = Modifier.height(16.dp))
+            var modelCode by remember { mutableStateOf("") }
             MenuFlyoutContainer(
                 flyout = {
-                    MenuFlyoutItem(text = { Text("Send") }, onClick = { isFlyoutVisible = false })
-                    MenuFlyoutItem(text = { Text("Reply") }, onClick = { isFlyoutVisible = false })
-                    MenuFlyoutItem(text = { Text("Reply All") }, onClick = { isFlyoutVisible = false })
+                    modelMap.entries.forEach {
+                        MenuFlyoutItem(text = { Text(it.value.modelName) }, onClick = { modelCode = it.key })
+                    }
                 },
-                content = { DropDownButton(onClick = { isFlyoutVisible = !isFlyoutVisible }, content = { Text("Email") }) },
+                content = { DropDownButton(onClick = { isFlyoutVisible = !isFlyoutVisible }, content = { Text("") }) },
                 adaptivePlacement = true,
                 placement = FlyoutPlacement.BottomAlignedStart
             )
+            Row {
+                Button(onClick = {saveAppConfig()}, modifier = Modifier) {
+                    Text("保存")
+                }
+                Spacer(modifier = Modifier.width(16.dp))
+                Button(onClick = {}, modifier = Modifier) {
+                    Text("启动")
+                }
+            }
         }
     }
 }

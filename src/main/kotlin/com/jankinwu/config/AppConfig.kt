@@ -1,16 +1,10 @@
 package com.jankinwu.config
 
 import baseUrlState
+import com.jankinwu.utils.loadConfig
+import com.jankinwu.utils.saveConfig
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import java.io.BufferedReader
-import java.io.File
-import java.io.FileInputStream
-import java.io.InputStreamReader
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
+import modelCodeState
 
 /**
  * @description: 配置项实体类
@@ -18,15 +12,17 @@ import java.nio.file.Paths
  * @date: 2024-11-10 11:43
  **/
 @Serializable
-data class AppConfig(var baseUrl: String? = "", var modelCode: String? = "")
+data class AppConfig(
+    var baseUrl: String? = "",
+    var modelCode: String? = ""
+)
 
-var configFile = "config.json"
+var configFileName = "app_config.json"
 
 fun loadAppConfig() {
-    val json = Json { ignoreUnknownKeys = true }
-    val content = readResourceFile(configFile)
-    val config = json.decodeFromString<AppConfig>(content)
-
+    val appConfig = loadConfig<AppConfig>(configFileName)
+    baseUrlState.value = appConfig.baseUrl?: ""
+    modelCodeState.value = appConfig.modelCode?: ""
 }
 
 fun saveAppConfig() {
@@ -34,37 +30,6 @@ fun saveAppConfig() {
         baseUrl = baseUrlState.value,
         modelCode = baseUrlState.value,
     )
-    val content = Json.encodeToString(appConfig)
-    println(Json.encodeToString(content))
-    writeToFile(configFile, content)
+    saveConfig(appConfig, configFileName)
 }
 
-fun readResourceFile(fileName: String): String {
-    val appRootDirectory = System.getProperty("user.dir")
-    val file = File("$appRootDirectory/config/$fileName")
-    if (!file.exists()) {
-        return Json.encodeToString(AppConfig())
-    }
-    return FileInputStream(file).use { inputStream ->
-        val readText = BufferedReader(InputStreamReader(inputStream)).readText()
-        readText
-    }
-}
-
-fun writeToFile(fileName: String, content: String) {
-    val appRootDirectory = System.getProperty("user.dir")
-    val file = File("$appRootDirectory/config/$fileName")
-    val path: Path = Paths.get("$appRootDirectory/config")
-    if (!Files.exists(path)) {
-        try {
-            Files.createDirectories(path)
-            println("目录已创建: $appRootDirectory/config")
-        } catch (e: Exception) {
-            println("创建目录时出现错误: ${e.message}")
-        }
-    }
-    if (!file.exists()) {
-        file.createNewFile()
-    }
-    file.writeText(content)
-}

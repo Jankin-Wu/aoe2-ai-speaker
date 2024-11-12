@@ -16,6 +16,8 @@ repositories {
     google()
 }
 
+val ktorVersion = "2.3.9"
+
 dependencies {
     // Note, if you develop a library, you should use compose.desktop.common.
     // compose.desktop.currentOs should be used in launcher-sourceSet
@@ -27,6 +29,9 @@ dependencies {
     implementation(files("libs/fluent-desktop-0.0.1-dev.8.jar"))
     implementation(files("libs/fluent-icons-extended-desktop-0.0.1-dev.8.jar"))
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.2")
+    implementation ("io.ktor:ktor-client-cio:$ktorVersion")
+    implementation("io.ktor:ktor-client-serialization:$ktorVersion")
+    implementation ("io.ktor:ktor-client-core:$ktorVersion")
 }
 
 compose.desktop {
