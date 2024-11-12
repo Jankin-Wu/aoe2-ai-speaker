@@ -9,6 +9,7 @@ data class ModelConfig(
     var promptText: String,
     var promptLang: String,
     var refAudioPath: String,
+    var speedFactor: Double,
 )
 
 val modelMap = mutableStateMapOf<String, ModelConfig>()
@@ -19,6 +20,5 @@ const val modelConfigFileName = "model_config.json"
 
 fun loadModelConfig() {
     val modelList = loadConfig<List<ModelConfig>>(modelConfigFileName)
-
 }
 

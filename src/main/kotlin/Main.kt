@@ -8,10 +8,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowPosition
+import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
 import com.jankinwu.config.modelMap
 import com.jankinwu.config.saveAppConfig
 import com.konyaco.fluent.component.*
+import java.awt.Dimension
+import java.awt.Toolkit
 
 //@Composable
 //@Preview
@@ -30,7 +34,17 @@ var baseUrlState = mutableStateOf("")
 var modelCodeState = mutableStateOf("")
 
 fun main() = application {
-    Window(onCloseRequest = ::exitApplication) {
+    val windowWidth by remember { mutableStateOf(300) }
+    val windowHeight by remember { mutableStateOf(300) }
+    Window(
+        onCloseRequest = ::exitApplication,
+        title = "AOE2 AI Speaker",
+        state = WindowState(
+            width = windowWidth.dp,
+            height = windowHeight.dp,
+            position = WindowPosition((getScreenWidth() / 4).dp, (getScreenHeight() / 3).dp)
+        ),
+    ) {
         MainPage()
     }
 }
@@ -43,8 +57,8 @@ fun MainPage() {
         contentAlignment = Alignment.Center
     ) {
         Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.width(200.dp),
+            horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.Center
         ) {
             var value by remember { mutableStateOf(TextFieldValue()) }
@@ -67,10 +81,11 @@ fun MainPage() {
                         MenuFlyoutItem(text = { Text(it.value.modelName) }, onClick = { modelCode = it.key })
                     }
                 },
-                content = { DropDownButton(onClick = { isFlyoutVisible = !isFlyoutVisible }, content = { Text("") }) },
+                content = { DropDownButton(onClick = { isFlyoutVisible = !isFlyoutVisible }, content = { Text("     ") }) },
                 adaptivePlacement = true,
                 placement = FlyoutPlacement.BottomAlignedStart
             )
+            Spacer(modifier = Modifier.height(16.dp))
             Row {
                 Button(onClick = {saveAppConfig()}, modifier = Modifier) {
                     Text("保存")
@@ -82,4 +97,14 @@ fun MainPage() {
             }
         }
     }
+}
+
+fun getScreenWidth(): Int {
+    val screenSize: Dimension = Toolkit.getDefaultToolkit().screenSize
+    return screenSize.width
+}
+
+fun getScreenHeight(): Int {
+    val screenSize: Dimension = Toolkit.getDefaultToolkit().screenSize
+    return screenSize.height
 }

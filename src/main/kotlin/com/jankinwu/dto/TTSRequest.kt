@@ -24,7 +24,7 @@ data class AudioRequest(
     @SerialName("batch_threshold") val batchThreshold: Double = 0.75,
     @SerialName("split_bucket") val splitBucket: String = "True",
     @SerialName("return_fragment") val returnFragment: String = "False",
-    @SerialName("speed_factor") val speedFactor: Double,
+    @SerialName("speed_factor") val speedFactor: Double = 1.0,
     @SerialName("streaming_mode") val streamingMode: String = "False",
     @SerialName("seed") val seed: Int = -1,
     @SerialName("parallel_infer") val parallelInfer: String = "True",
