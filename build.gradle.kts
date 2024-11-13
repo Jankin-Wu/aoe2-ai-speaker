@@ -32,6 +32,7 @@ dependencies {
     implementation ("io.ktor:ktor-client-cio:$ktorVersion")
     implementation("io.ktor:ktor-client-serialization:$ktorVersion")
     implementation ("io.ktor:ktor-client-core:$ktorVersion")
+    implementation ("io.ktor:ktor-client-websockets:$ktorVersion")
 }
 
 compose.desktop {
@@ -42,6 +43,14 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "aoe2-ai-speaker"
             packageVersion = "1.0.0"
+            windows {
+                shortcut = true
+                dirChooser = true
+                menu = true
+                upgradeUuid = "781660a5-c9c0-4e70-9d2a-1606d9fc9b12"
+                iconFile.set(project.file("speaker.ico"))
+                packageName = "AoE2 AI Speaker"
+            }
         }
     }
 }

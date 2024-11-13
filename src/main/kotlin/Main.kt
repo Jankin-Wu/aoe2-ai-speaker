@@ -5,12 +5,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
+import com.jankinwu.component.FormItem
 import com.jankinwu.config.modelMap
 import com.jankinwu.config.saveAppConfig
 import com.konyaco.fluent.component.*
@@ -34,7 +36,7 @@ var baseUrlState = mutableStateOf("")
 var modelCodeState = mutableStateOf("")
 
 fun main() = application {
-    val windowWidth by remember { mutableStateOf(300) }
+    val windowWidth by remember { mutableStateOf(400) }
     val windowHeight by remember { mutableStateOf(300) }
     Window(
         onCloseRequest = ::exitApplication,
@@ -42,8 +44,9 @@ fun main() = application {
         state = WindowState(
             width = windowWidth.dp,
             height = windowHeight.dp,
-            position = WindowPosition((getScreenWidth() / 4).dp, (getScreenHeight() / 3).dp)
+            position = WindowPosition((getScreenWidth() / 4).dp, (getScreenHeight() / 3).dp),
         ),
+        icon = painterResource("images/speaker.png"),
     ) {
         MainPage()
     }
@@ -57,42 +60,66 @@ fun MainPage() {
         contentAlignment = Alignment.Center
     ) {
         Column(
-            modifier = Modifier.width(200.dp),
+            modifier = Modifier.width(300.dp),
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.Center
         ) {
             var value by remember { mutableStateOf(TextFieldValue()) }
-            TextField(
-                value = value,
-                onValueChange = { value = it },
+            FormItem("BaseUrl") {
+                TextField(
+                    value = value,
+                    onValueChange = { value = it },
 //                header = { Text("Base Url:") },
-                placeholder = {
-                    Text(
-                        "http://127.0.0.1:8080",
-                        color = Color.LightGray
-                    )
-                },
-            )
+                    placeholder = {
+                        Text(
+                            "http://127.0.0.1:8080",
+                            color = Color.LightGray
+                        )
+                    },
+                )
+            }
             Spacer(modifier = Modifier.height(16.dp))
             var modelCode by remember { mutableStateOf("") }
-            MenuFlyoutContainer(
-                flyout = {
-                    modelMap.entries.forEach {
-                        MenuFlyoutItem(text = { Text(it.value.modelName) }, onClick = { modelCode = it.key })
-                    }
-                },
-                content = { DropDownButton(onClick = { isFlyoutVisible = !isFlyoutVisible }, content = { Text("     ") }) },
-                adaptivePlacement = true,
-                placement = FlyoutPlacement.BottomAlignedStart
-            )
+            var isRunning by remember { mutableStateOf(false) }
+            FormItem("ModelName") {
+                MenuFlyoutContainer(
+                    flyout = {
+                        modelMap.entries.forEach {
+                            MenuFlyoutItem(text = { Text(it.value.modelName) }, onClick = { modelCode = it.key })
+                        }
+                    },
+                    content = {
+                        DropDownButton(onClick = { isFlyoutVisible = !isFlyoutVisible }, content = {
+                            Box(Modifier.width(108.dp)) {
+                                Text("")
+                            }
+                        })
+                    },
+                    adaptivePlacement = true,
+                    placement = FlyoutPlacement.BottomAlignedStart
+                )
+            }
             Spacer(modifier = Modifier.height(16.dp))
-            Row {
-                Button(onClick = {saveAppConfig()}, modifier = Modifier) {
+            Row (
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ){
+                Button(onClick = { saveAppConfig() }, modifier = Modifier) {
                     Text("保存")
                 }
                 Spacer(modifier = Modifier.width(16.dp))
-                Button(onClick = {}, modifier = Modifier) {
-                    Text("启动")
+                Button(
+                    onClick = {
+                        isRunning = !isRunning
+                    },
+                    modifier = Modifier
+                ) {
+                    if (isRunning) {
+                        Text("停止")
+                    } else {
+                        Text("启动")
+                    }
                 }
             }
         }
