@@ -15,7 +15,10 @@ import androidx.compose.ui.window.application
 import com.jankinwu.component.FormItem
 import com.jankinwu.config.modelMap
 import com.jankinwu.config.saveAppConfig
+import com.jankinwu.utils.audioChannel
+import com.jankinwu.utils.playAudioQueue
 import com.konyaco.fluent.component.*
+import kotlinx.coroutines.launch
 import java.awt.Dimension
 import java.awt.Toolkit
 
@@ -34,10 +37,13 @@ import java.awt.Toolkit
 //}
 var baseUrlState = mutableStateOf("")
 var modelCodeState = mutableStateOf("")
+var isRunning = mutableStateOf(false)
+
 
 fun main() = application {
     val windowWidth by remember { mutableStateOf(400) }
     val windowHeight by remember { mutableStateOf(300) }
+    val coroutineScope = rememberCoroutineScope()
     Window(
         onCloseRequest = ::exitApplication,
         title = "AOE2 AI Speaker",
@@ -49,6 +55,10 @@ fun main() = application {
         icon = painterResource("images/speaker.png"),
     ) {
         MainPage()
+    }
+
+    coroutineScope.launch {
+        playAudioQueue(audioChannel)
     }
 }
 
@@ -80,7 +90,7 @@ fun MainPage() {
             }
             Spacer(modifier = Modifier.height(16.dp))
             var modelCode by remember { mutableStateOf("") }
-            var isRunning by remember { mutableStateOf(false) }
+
             FormItem("ModelName") {
                 MenuFlyoutContainer(
                     flyout = {
@@ -111,11 +121,11 @@ fun MainPage() {
                 Spacer(modifier = Modifier.width(16.dp))
                 Button(
                     onClick = {
-                        isRunning = !isRunning
+                        isRunning.value = !isRunning.value
                     },
                     modifier = Modifier
                 ) {
-                    if (isRunning) {
+                    if (isRunning.value) {
                         Text("停止")
                     } else {
                         Text("启动")

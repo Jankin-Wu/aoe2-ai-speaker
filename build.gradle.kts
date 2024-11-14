@@ -33,6 +33,10 @@ dependencies {
     implementation("io.ktor:ktor-client-serialization:$ktorVersion")
     implementation ("io.ktor:ktor-client-core:$ktorVersion")
     implementation ("io.ktor:ktor-client-websockets:$ktorVersion")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+//    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:$ktorVersion")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+
 }
 
 compose.desktop {

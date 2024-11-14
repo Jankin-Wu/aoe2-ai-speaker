@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
  * @date: 2024-11-09 21:03
  **/
 @Serializable
-data class AudioRequest(
+data class TTSRequest(
     @SerialName("text") val text: String,
     @SerialName("text_lang") val textLang: String = "auto",
     @SerialName("ref_audio_path") var refAudioPath: String,
