@@ -1,14 +1,20 @@
 package com.jankinwu.ws
 
 import androidx.compose.runtime.*
+import com.jankinwu.config.modelMap
+import com.jankinwu.dto.TTSRequest
+import com.jankinwu.http.sendTTSReq
+import com.konyaco.fluent.component.ContentDialog
 import io.ktor.client.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.http.*
 import io.ktor.websocket.*
+import isRunning
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
+import modelCode
 
 @Composable
 fun webSocketClient(scope: CoroutineScope) {
@@ -24,7 +30,7 @@ fun webSocketClient(scope: CoroutineScope) {
                 method = HttpMethod.Get,
                 host = "localhost",
                 port = 8080,
-                path = "/websocket/plugin/1"
+                path = "/websocket/plugin/2"
             ) {
                 println("Connected to server.")
                 // 发送消息到服务器
@@ -36,7 +42,7 @@ fun webSocketClient(scope: CoroutineScope) {
                     val receivedText = frame.readText()
                     println("Received message: $receivedText")
 
-                    handleMessage(receivedText, scope)
+                    handleMessage(receivedText, scope, isRunning.value)
                 }
             }
         } catch (e: Throwable) {
@@ -53,11 +59,29 @@ fun webSocketClient(scope: CoroutineScope) {
 }
 
 
-fun handleMessage(receivedText: String, scope: CoroutineScope) {
+fun handleMessage(receivedText: String, scope: CoroutineScope, isRunning: Boolean) {
     val json = Json { ignoreUnknownKeys = true }
     val jsonElement = json.parseToJsonElement(receivedText)
 //    val pluginItemCode = jsonElement.jsonObject["pluginItemCode"].toString().toInt()
     val data = jsonElement.jsonObject["data"].toString()
+    if (isRunning) {
+        val modelConfig = modelMap[modelCode.value]
+        if (modelConfig == null) {
+            print("未找到模型配置信息")
+//            ContentDialog()
+            return
+        }
+        val ttsRequest = modelConfig.let {
+            TTSRequest(
+                text = "Hello, world!",
+                refAudioPath = it.refAudioPath,
+                promptText = it.promptText,
+                promptLang = it.promptLang,
+                speedFactor = it.speedFactor
+            )
+        }
+        sendTTSReq(ttsRequest, scope)
+    }
 }
 
 

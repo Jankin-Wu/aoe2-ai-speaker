@@ -13,11 +13,16 @@ import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
 import com.jankinwu.component.FormItem
+import com.jankinwu.config.loadAppConfig
+import com.jankinwu.config.loadModelConfig
 import com.jankinwu.config.modelMap
 import com.jankinwu.config.saveAppConfig
+import com.jankinwu.http.sendSwitchingModelReq
 import com.jankinwu.utils.audioChannel
 import com.jankinwu.utils.playAudioQueue
+import com.jankinwu.ws.webSocketClient
 import com.konyaco.fluent.component.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.awt.Dimension
 import java.awt.Toolkit
@@ -38,12 +43,15 @@ import java.awt.Toolkit
 var baseUrlState = mutableStateOf("")
 var modelCodeState = mutableStateOf("")
 var isRunning = mutableStateOf(false)
+var modelCode = mutableStateOf("")
 
 
 fun main() = application {
     val windowWidth by remember { mutableStateOf(400) }
     val windowHeight by remember { mutableStateOf(300) }
     val coroutineScope = rememberCoroutineScope()
+    loadModelConfig()
+    loadAppConfig()
     Window(
         onCloseRequest = ::exitApplication,
         title = "AOE2 AI Speaker",
@@ -54,7 +62,8 @@ fun main() = application {
         ),
         icon = painterResource("images/speaker.png"),
     ) {
-        MainPage()
+        webSocketClient(coroutineScope)
+        MainPage(coroutineScope)
     }
 
     coroutineScope.launch {
@@ -64,7 +73,7 @@ fun main() = application {
 
 @Preview
 @Composable
-fun MainPage() {
+fun MainPage(coroutineScope: CoroutineScope) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -89,19 +98,21 @@ fun MainPage() {
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
-            var modelCode by remember { mutableStateOf("") }
 
             FormItem("ModelName") {
                 MenuFlyoutContainer(
                     flyout = {
                         modelMap.entries.forEach {
-                            MenuFlyoutItem(text = { Text(it.value.modelName) }, onClick = { modelCode = it.key })
+                            MenuFlyoutItem(text = { Text(it.value.modelName) }, onClick = {
+                                modelCode.value = it.key
+                                sendSwitchingModelReq(it.value.weightsPath, coroutineScope)
+                            })
                         }
                     },
                     content = {
                         DropDownButton(onClick = { isFlyoutVisible = !isFlyoutVisible }, content = {
                             Box(Modifier.width(108.dp)) {
-                                Text("")
+                                modelMap[modelCode.value]?.let { Text(it.modelName) }
                             }
                         })
                     },

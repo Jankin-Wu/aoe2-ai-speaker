@@ -1,6 +1,5 @@
 package com.jankinwu.utils
 
-import com.jankinwu.config.AppConfig
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.BufferedReader
@@ -18,17 +17,17 @@ inline fun <reified T> saveConfig(data: T, fileName: String) {
     writeToFile(fileName, content)
 }
 
-inline fun <reified T : Any> loadConfig(configFileName: String): T {
+inline fun <reified T : Any> loadConfig(configFileName: String): T? {
     val json = Json { ignoreUnknownKeys = true }
     val content = readResourceFile(configFileName)
-    val config = json.decodeFromString<T>(content)
+    val config = content?.let { json.decodeFromString<T>(it) }
     return config
 }
-fun readResourceFile(fileName: String): String {
+fun readResourceFile(fileName: String): String? {
     val appRootDirectory = System.getProperty("user.dir")
     val file = File("$appRootDirectory/config/$fileName")
     if (!file.exists()) {
-        return Json.encodeToString(AppConfig())
+        return null
     }
     return FileInputStream(file).use { inputStream ->
         val readText = BufferedReader(InputStreamReader(inputStream)).readText()

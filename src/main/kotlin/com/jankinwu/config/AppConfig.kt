@@ -21,8 +21,13 @@ var configFileName = "app_config.json"
 
 fun loadAppConfig() {
     val appConfig = loadConfig<AppConfig>(configFileName)
-    baseUrlState.value = appConfig.baseUrl?: ""
-    modelCodeState.value = appConfig.modelCode?: ""
+    if (appConfig != null) {
+        baseUrlState.value = appConfig.baseUrl?: ""
+        modelCodeState.value = appConfig.modelCode?: ""
+    } else {
+        baseUrlState.value = ""
+        modelCodeState.value = ""
+    }
 }
 
 fun saveAppConfig() {
